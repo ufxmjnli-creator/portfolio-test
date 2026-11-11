@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alex Chen · Studio — 资深前端架构师与前瞻体验设计师</title>
+  
+  <!-- Google Fonts: Cormorant Garamond, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS 3.4.17 -->
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+
+  <!-- 大厂创意动效与3D图形工程技术栈 (GSAP + ScrollTrigger + Lenis + Three.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'Songti SC', 'STSong', 'Noto Serif CJK SC', 'Georgia', 'serif'],
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"PingFang SC"', '"Hiragino Sans GB"', '"Microsoft YaHei"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          colors: {
+            morandi: {
+              frost: '#FAF8F6',
+              mist: '#F4ECE8',
+              pink: '#EADBDA',
+              clay: '#DFCACA',
+              cedar: '#C9B2AC',
+              deepCedar: '#9E857F',
+              cinnamon: '#8E6E65',
+              darkHero: '#131212',
+              darkArch: '#1A1616',
+              darkWorks: '#241D1D',
+              darkJourney: '#2B2120',
+              darkCedar: '#1E1716',
+            }
+          },
+          letterSpacing: {
+            widest: '0.25em',
+            ultra: '0.35em',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* CSS Custom Properties & Base Styles */
+    :root {
+      --bg-current: #FAF8F6;
+      --card-bg: rgba(255, 253, 250, 0.72);
+      --card-border: rgba(255, 255, 255, 0.65);
+      --card-border-hover: rgba(255, 255, 255, 0.95);
+      --card-shadow: 0 16px 36px -12px rgba(142, 110, 101, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+      --card-shadow-hover: 0 28px 50px -16px rgba(142, 110, 101, 0.16), 0 2px 6px rgba(0, 0, 0, 0.04);
+      --text-primary: #262220;
+      --text-secondary: #6B5E59;
+      --text-muted: #9E8D86;
+      --accent: #8E6E65;
+      --accent-soft: rgba(142, 110, 101, 0.12);
+      --grid-line: rgba(142, 110, 101, 0.07);
+      --lens-glow: rgba(255, 255, 255, 0.45);
+    }
+
+    html.dark {
+      --bg-current: #131212;
+      --card-bg: rgba(26, 22, 22, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-hover: rgba(234, 219, 218, 0.25);
+      --card-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+      --card-shadow-hover: 0 28px 50px -16px rgba(0, 0, 0, 0.7), 0 2px 6px rgba(0, 0, 0, 0.5);
+      --text-primary: #F5EFEB;
+      --text-secondary: #C2B3AE;
+      --text-muted: #7E706B;
+      --accent: #C9B2AC;
+      --accent-soft: rgba(201, 178, 172, 0.15);
+      --grid-line: rgba(255, 255, 255, 0.04);
+      --lens-glow: rgba(201, 178, 172, 0.15);
+    }
+
+    body {
+      background-color: var(--bg-current);
+      color: var(--text-primary);
+      transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Diffuse Background Glows */
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
+      transition: transform 0.2s linear, opacity 0.4s ease;
+    }
+
+    /* 12-Column Invisible Modular Grid Overlay */
+    #grid-overlay {
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 40;
+    }
+
+    .grid-col-guide {
+      height: 100%;
+      border-left: 1px dashed var(--grid-line);
+      border-right: 1px dashed var(--grid-line);
+      background-color: rgba(142, 110, 101, 0.015);
+    }
+
+    /* Apple Liquid Glass Card */
+    .liquid-glass-card {
+      position: relative;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+      border-radius: 1.5rem;
+      transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  border-color 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  backdrop-filter 0.45s ease;
+      overflow: hidden;
+    }
+
+    .liquid-glass-card:hover {
+      transform: translateY(-8px) scale(1.012);
+      backdrop-filter: blur(36px) saturate(220%);
+      -webkit-backdrop-filter: blur(36px) saturate(220%);
+      border-color: var(--card-border-hover);
+      box-shadow: var(--card-shadow-hover), 
+                  inset 0 2px 2.5px rgba(255, 255, 255, 0.9),
+                  0 0 0 1px rgba(255, 255, 255, 0.25);
+    }
+
+    html.dark .liquid-glass-card {
+      box-shadow: var(--card-shadow), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    html.dark .liquid-glass-card:hover {
+      box-shadow: var(--card-shadow-hover), 
+                  inset 0 1.5px 2px rgba(255, 255, 255, 0.2),
+                  0 0 0 1px rgba(201, 178, 172, 0.15);
+    }
+
+    /* Inner Mouse Lens Glow */
+    .liquid-glass-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0;
+      border-radius: inherit;
+      background: radial-gradient(450px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--lens-glow), transparent 60%);
+      transition: opacity 0.35s ease;
+      z-index: 1;
+    }
+
+    .liquid-glass-card:hover .liquid-glass-glow {
+      opacity: 1;
+    }
+
+            /* Horizontal Slider Mechanics */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .cursor-grab {
+      cursor: grab;
+    }
+    .cursor-grabbing {
+      cursor: grabbing;
+      user-select: none;
+    }
+    .parallax-media {
+      will-change: transform;
+      transition: transform 0.15s ease-out;
+    }
+    .hero-depth-layer {
+      will-change: transform, opacity;
+      transition: transform 0.1s linear, opacity 0.15s linear;
+    }
+
+        /* 羊绒艺术纸微噪点 (Cashmere Film Grain Tooth) */
+    .cashmere-noise-layer {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 45;
+      opacity: 0.024;
+      mix-blend-mode: overlay;
+    }
+    html.dark .cashmere-noise-layer {
+      opacity: 0.036;
+    }
+
+
+
+    /* 动态晶体倒角高光与 3D 景深 (Dynamic Bevel Highlight & 3D Depth) */
+    .liquid-glass-card {
+      transform-style: preserve-3d;
+      will-change: transform, box-shadow, filter;
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                  box-shadow 0.35s ease,
+                  border-color 0.35s ease,
+                  opacity 0.4s ease,
+                  filter 0.4s ease;
+    }
+
+    /* Liquid Glass Sheen Wave */
+    .liquid-sheen-wave {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        115deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.08) 45%,
+        rgba(255, 255, 255, 0.22) 50%,
+        rgba(255, 255, 255, 0.08) 55%,
+        transparent 65%
+      );
+      transform: translateX(-100%) rotate(25deg);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .liquid-glass-card:hover .liquid-sheen-wave {
+      animation: sheenSweep 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes sheenSweep {
+      0% { transform: translateX(-100%) rotate(25deg); }
+      100% { transform: translateX(100%) rotate(25deg); }
+    }
+
+    /* Parallax Column Base (Driven purely by JS translate3d without CSS transition to avoid jitter) */
+    .parallax-col {
+      will-change: transform;
+    }
+
+    /* Downward Apple-Style Scroll Pill & Tactile Motion */
+    @keyframes scrollPillMove {
+      0% { transform: translateY(0); opacity: 0.2; }
+      30% { opacity: 0.95; }
+      70% { opacity: 0.95; }
+      100% { transform: translateY(12px); opacity: 0; }
+    }
+    .animate-scroll-pill {
+      animation: scrollPillMove 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    /* Bidirectional Scroll Reveal & Tuck Animation */
+    .scroll-flow-item {
+      will-change: transform, opacity;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Skeleton Screen Shimmer */
+    @keyframes skeleton-shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .skeleton-shimmer-bar {
+      position: relative;
+      overflow: hidden;
+      background-color: rgba(142, 110, 101, 0.08);
+      border-radius: 0.5rem;
+    }
+    html.dark .skeleton-shimmer-bar {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    .skeleton-shimmer-bar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      animation: skeleton-shimmer 1.4s infinite;
+    }
+    html.dark .skeleton-shimmer-bar::after {
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    }
+
+    /* Stacking Deck Card Physics */
+    .stacking-card {
+      position: sticky;
+      transition: transform 0.25s ease-out, filter 0.25s ease-out;
+      will-change: transform, filter;
+    }
+
+    /* Custom Toast Container */
+    #toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      pointer-events: none;
+    }
+    .toast-item {
+      pointer-events: auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--card-border);
+      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
+      border-radius: 9999px;
+      padding: 0.65rem 1.25rem;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      color: var(--text-primary);
+    }
+    @keyframes toastSlideIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toastSlideOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(8px) scale(0.96); }
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      background: rgba(19, 18, 18, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+  </style>
+</head>
+
+<body class="antialiased min-h-screen selection:bg-stone-300 selection:text-stone-900 dark:selection:bg-stone-700 dark:selection:text-stone-100">
+
+  <!-- ============================================================ -->
+  <!-- 羊绒艺术纸物理微噪点图层 (Cashmere Paper Grain Texture) -->
+  <!-- ============================================================ -->
+  <svg class="cashmere-noise-layer" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <filter id="cashmere-noise-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#cashmere-noise-filter)" />
+  </svg>
+
+  <!-- ============================================================ -->
+  <!-- 骨架屏占位层 (Skeleton Screen Simulation) -->
+  <!-- ============================================================ -->
+  <div id="skeleton-screen" class="fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-12 bg-[#FAF8F6] dark:bg-[#131212] transition-opacity duration-700 pointer-events-none" aria-hidden="true">
+    <div class="max-w-6xl w-full mx-auto flex items-center justify-between">
+      <div class="skeleton-shimmer-bar w-36 h-5"></div>
+      <div class="flex gap-4">
+        <div class="skeleton-shimmer-bar w-16 h-5"></div>
+        <div class="skeleton-shimmer-bar w-16 h-5"></div>
+        <div class="skeleton-shimmer-bar w-20 h-5"></div>
+      </div>
+    </div>
+    
+    <div class="max-w-6xl w-full mx-auto flex flex-col items-center justify-center my-auto space-y-6">
+      <div class="skeleton-shimmer-bar w-24 h-4"></div>
+      <div class="skeleton-shimmer-bar w-3/4 max-w-xl h-14 sm:h-20"></div>
+      <div class="skeleton-shimmer-bar w-1/2 max-w-sm h-6"></div>
+      <div class="flex gap-4 pt-4">
+        <div class="skeleton-shimmer-bar w-32 h-11 rounded-full"></div>
+        <div class="skeleton-shimmer-bar w-36 h-11 rounded-full"></div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="skeleton-shimmer-bar h-48 rounded-2xl"></div>
+      <div class="skeleton-shimmer-bar h-48 rounded-2xl"></div>
+      <div class="skeleton-shimmer-bar h-48 rounded-2xl"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 背景氛围光球与隐形 12 栏参考线 -->
+  <!-- ============================================================ -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div id="orb-1" class="ambient-orb w-[550px] h-[550px] -top-40 -left-40 bg-[#F4ECE8] dark:bg-[#241D1D]/40"></div>
+    <div id="orb-2" class="ambient-orb w-[650px] h-[650px] top-1/3 -right-48 bg-[#EADBDA]/80 dark:bg-[#2B2120]/30"></div>
+    <div id="orb-3" class="ambient-orb w-[600px] h-[600px] -bottom-32 left-1/4 bg-[#DFCACA]/70 dark:bg-[#1E1716]/40"></div>
+    <!-- 板块间流体微晕透镜光斑 -->
+    <div id="orb-4" class="ambient-orb w-[480px] h-[480px] top-2/3 -left-32 bg-[#F4ECE8]/60 dark:bg-[#241D1D]/25"></div>
+    <div id="orb-5" class="ambient-orb w-[520px] h-[520px] top-[85%] -right-32 bg-[#DFCACA]/50 dark:bg-[#1E1716]/30"></div>
+  </div>
+
+  <!-- 响应式模数参考线网格 (移动端 4 栏 · 平板 8 栏 · 桌面 12 栏) -->
+  <div id="grid-overlay" class="fixed inset-0 z-40 opacity-0 transition-opacity duration-300 pointer-events-none">
+    <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 h-full">
+      <div class="grid grid-cols-4 sm:grid-cols-8 lg:grid-cols-12 gap-4 sm:gap-6 h-full">
+        <!-- 移动端基准 4 栏 -->
+        <div class="grid-col-guide col-span-1"></div>
+        <div class="grid-col-guide col-span-1"></div>
+        <div class="grid-col-guide col-span-1"></div>
+        <div class="grid-col-guide col-span-1"></div>
+        <!-- 平板端展开 +4 栏 (共 8 栏) -->
+        <div class="grid-col-guide col-span-1 hidden sm:block"></div>
+        <div class="grid-col-guide col-span-1 hidden sm:block"></div>
+        <div class="grid-col-guide col-span-1 hidden sm:block"></div>
+        <div class="grid-col-guide col-span-1 hidden sm:block"></div>
+        <!-- 桌面端展开 +4 栏 (共 12 栏) -->
+        <div class="grid-col-guide col-span-1 hidden lg:block"></div>
+        <div class="grid-col-guide col-span-1 hidden lg:block"></div>
+        <div class="grid-col-guide col-span-1 hidden lg:block"></div>
+        <div class="grid-col-guide col-span-1 hidden lg:block"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 页面主体容器 (严格限制在 12 栏模数空间) -->
+  <!-- ============================================================ -->
+  <div class="relative z-10 flex flex-col min-h-screen">
+
+    <!-- 轻量通透无框顶栏 (Navbar: 自然文档流相对定位，随滑动自然移出视线) -->
+    <header class="w-full relative z-30 pt-8 pb-4">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div class="flex items-center justify-between py-3">
+          
+          <!-- 左侧排印标识 -->
+          <a href="#" class="group flex items-center gap-2.5 text-stone-800 dark:text-stone-100 focus:outline-none" aria-label="Alex Chen Studio 首屏">
+            <span class="w-2 h-2 rounded-full bg-stone-700 dark:bg-stone-300 transition-transform group-hover:scale-125 duration-300"></span>
+            <span class="font-serif font-medium tracking-wide text-lg sm:text-xl">Alex Chen · Studio</span>
+          </a>
+
+          <!-- 中间极轻量文字导航 -->
+          <nav class="hidden md:flex items-center gap-8 text-sm font-sans text-stone-600 dark:text-stone-300" aria-label="主导航">
+            <a href="#philosophy" class="transition-colors hover:text-stone-900 dark:hover:text-stone-50">哲学</a>
+            <a href="#disciplines" class="transition-colors hover:text-stone-900 dark:hover:text-stone-50">能力</a>
+            <a href="#works" class="transition-colors hover:text-stone-900 dark:hover:text-stone-50">作品</a>
+            <a href="#journey" class="transition-colors hover:text-stone-900 dark:hover:text-stone-50">历程</a>
+          </nav>
+
+          <!-- 右侧控件组：音效开关、明暗切换、联系药丸按钮 -->
+          <div class="flex items-center gap-2.5 sm:gap-3.5">
+            <!-- 触觉音效开关 -->
+            <button id="audio-toggle-btn" class="p-2 sm:px-3 sm:py-1.5 rounded-full border border-stone-300/70 dark:border-stone-700/70 text-xs font-mono flex items-center gap-1.5 text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-500 transition-colors focus:outline-none" title="触觉音效开关 (Web Audio API)">
+              <i data-lucide="volume-2" class="w-3.5 h-3.5 audio-on-icon"></i>
+              <i data-lucide="volume-x" class="w-3.5 h-3.5 audio-off-icon hidden"></i>
+              <span class="hidden sm:inline text-[11px] audio-label">音效 开</span>
+            </button>
+
+            <!-- 明暗主题切换 -->
+            <button id="theme-toggle-btn" class="p-2 rounded-full border border-stone-300/70 dark:border-stone-700/70 text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-500 transition-colors focus:outline-none" title="切换明暗主题" aria-label="切换明暗主题">
+              <i data-lucide="sun" class="w-4 h-4 hidden dark:block"></i>
+              <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+            </button>
+
+            <!-- 药丸式联络按钮 -->
+            <button id="nav-contact-btn" class="px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 hover:opacity-90 transition-opacity focus:outline-none shadow-sm">
+              联络委托
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 首屏区域 (Hero Section: min-h-[90vh], 垂直居中，克制留白) -->
+    <!-- ============================================================ -->
+    <section id="hero" class="relative z-10 min-h-[88vh] sm:min-h-[92vh] flex flex-col justify-center items-center text-center will-change-transform overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 w-full py-12 my-auto">
+        <div id="hero-content" class="max-w-3xl mx-auto flex flex-col items-center">
+          
+          <!-- 眉标 (视差层 1: 0.08x) -->
+          <div id="hero-eyebrow" class="hero-depth-layer mb-5 sm:mb-7">
+            <span class="font-mono text-xs sm:text-sm tracking-ultra text-stone-500 dark:text-stone-400 uppercase font-medium">
+              ALEX CHEN
+            </span>
+          </div>
+
+          <!-- 主标题：高级衬线字体，典雅字字千钧 (视差层 2: 0.18x) -->
+          <h1 id="hero-title" class="hero-depth-layer font-serif font-normal text-5xl sm:text-7xl lg:text-8xl tracking-tight text-stone-900 dark:text-stone-50 leading-[1.08] mb-6 sm:mb-8 select-none">
+            纯粹。精确。有度。
+          </h1>
+
+          <!-- 副标：单行精炼 (视差层 3: 0.28x) -->
+          <p id="hero-subtitle" class="hero-depth-layer font-sans font-normal text-base sm:text-lg lg:text-xl text-stone-600 dark:text-stone-300 max-w-xl leading-relaxed mb-10 sm:mb-12">
+            触觉交互设计与现代前端工程。
+          </p>
+
+          <!-- 操作按钮组 (视差层 4: 0.38x) -->
+          <div id="hero-actions" class="hero-depth-layer flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+            <a href="#works" class="px-7 py-3 text-sm font-medium rounded-full bg-stone-800 text-stone-100 dark:bg-stone-200 dark:text-stone-900 hover:bg-stone-900 dark:hover:bg-white transition-all shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98]">
+              浏览精选作品
+            </a>
+            <button id="hero-resume-btn" class="group inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-50 py-3 transition-colors">
+              <span>获取简历档案 (PDF)</span>
+              <span class="transition-transform group-hover:translate-x-1 duration-200">›</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 底部下滑探索触控胶囊 (Apple 极简触觉交互设计) -->
+      <button id="hero-scroll-indicator" class="absolute bottom-8 sm:bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2.5 text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-200 transition-colors focus:outline-none cursor-pointer group z-20" aria-label="向下滚动探索">
+        <span class="text-[10px] font-mono tracking-ultra uppercase text-stone-400 dark:text-stone-500 group-hover:text-stone-700 dark:group-hover:text-stone-200 transition-colors select-none">
+          EXPLORE · 探索
+        </span>
+        <div class="w-5 h-9 rounded-full border border-stone-300 dark:border-stone-700 bg-stone-100/50 dark:bg-stone-900/50 backdrop-blur-sm flex items-start justify-center p-1 shadow-sm group-hover:border-stone-400 dark:group-hover:border-stone-500 transition-all">
+          <div class="w-1.5 h-2 rounded-full bg-stone-600 dark:bg-stone-300 animate-scroll-pill"></div>
+        </div>
+      </button>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 设计哲学与架构原则 (Philosophy Section: 物理帷幕层级 z-20，绝不与首屏文字冲突) -->
+    <!-- ============================================================ -->
+    <section id="philosophy" class="py-20 sm:py-28 relative z-10 overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div class="max-w-3xl scroll-flow-item">
+          <div class="font-mono text-xs tracking-widest text-stone-400 dark:text-stone-500 uppercase mb-4">
+            01 / PHILOSOPHY
+          </div>
+          <h2 class="font-serif text-3xl sm:text-5xl text-stone-900 dark:text-stone-50 font-normal leading-tight mb-8">
+            界面不仅是像素的排列，<br class="hidden sm:inline">更是物理张力与数字秩序的克制共生。
+          </h2>
+          <div class="space-y-6 text-stone-600 dark:text-stone-300 font-sans text-base sm:text-lg leading-relaxed">
+            <p>
+              我们拒绝在屏幕上铺陈冗余的修饰与喧闹的动效。每一次触碰、滑动与反馈，皆源于对真实世界质量、惯性与材质阻尼的严密推演。
+            </p>
+            <p>
+              在底层，是高内聚、零冗余的严苛架构治理；在表层，是晨霜与肉桂般温润的羊绒质感。让科技退居幕后，让内容与人的感知自然相逢。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 领域能力板块 (Disciplines Section: 水平滑动流动玻璃画廊) -->
+    <!-- ============================================================ -->
+    <section id="disciplines" class="py-20 sm:py-28 relative overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        
+        <!-- 章节标头与水平滑动控件 -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-stone-200/60 dark:border-stone-800/60 scroll-flow-item">
+          <div>
+            <div class="font-mono text-xs tracking-widest text-stone-400 dark:text-stone-500 uppercase mb-3">
+              02 / DISCIPLINES
+            </div>
+            <h2 class="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-stone-100 font-normal">
+              领域能力与实践架构
+            </h2>
+          </div>
+          <div class="flex items-center gap-5 mt-4 md:mt-0">
+            <span class="text-xs font-sans text-stone-400 dark:text-stone-500 hidden sm:inline">← 可拖拽或左右滑动浏览 →</span>
+            <!-- 水平滑动药丸控制器 -->
+            <div class="flex items-center gap-2 font-mono text-xs text-stone-500">
+              <span id="disc-slider-indicator" class="text-[11px] text-stone-400 mr-1 select-none">01 / 03</span>
+              <button id="disc-slider-prev" class="w-8 h-8 rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-500 flex items-center justify-center transition-all focus:outline-none" aria-label="向左滑动">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button id="disc-slider-next" class="w-8 h-8 rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-500 flex items-center justify-center transition-all focus:outline-none" aria-label="向右滑动">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 水平滑动卡片画廊 (Horizontal Slider Track) -->
+        <div id="disciplines-grid" class="w-full">
+          <div id="disciplines-slider" class="horizontal-slider flex gap-6 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-4 cursor-grab">
+          
+          <!-- 卡片 1: 界面与触觉质感 -->
+          <div class="w-[86vw] sm:w-[380px] lg:w-[420px] flex-shrink-0 snap-start">
+            <div class="liquid-glass-card p-8 sm:p-9 h-full flex flex-col justify-between" data-card-sound="crystal">
+              <div class="liquid-glass-glow"></div>
+              <div class="liquid-sheen-wave"></div>
+              
+              <div class="relative z-10">
+                <div class="w-10 h-10 rounded-2xl bg-stone-200/60 dark:bg-stone-800/60 flex items-center justify-center text-stone-800 dark:text-stone-200 mb-6">
+                  <i data-lucide="fingerprint" class="w-5 h-5"></i>
+                </div>
+                <div class="font-mono text-xs text-stone-400 dark:text-stone-500 tracking-wider mb-2">01 / TACTILITY</div>
+                <h3 class="font-serif text-2xl text-stone-900 dark:text-stone-100 mb-4 font-medium">界面与触觉质感</h3>
+                <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed mb-6 font-sans">
+                  深入物理渲染管线、惯性衰减曲线与触觉微排印。将真实世界的重力、弹性张力与表面光学微折射投射于现代数字视界。
+                </p>
+              </div>
+
+              <div class="relative z-10 pt-6 border-t border-stone-200/50 dark:border-stone-800/50 flex flex-wrap gap-2">
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Spring Physics</span>
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Fluid Micro-Gestures</span>
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Web Audio API</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 2: 工程与系统架构 -->
+          <div class="w-[86vw] sm:w-[380px] lg:w-[420px] flex-shrink-0 snap-start">
+            <div class="liquid-glass-card p-8 sm:p-9 h-full flex flex-col justify-between" data-card-sound="wood">
+              <div class="liquid-glass-glow"></div>
+              <div class="liquid-sheen-wave"></div>
+
+              <div class="relative z-10">
+                <div class="w-10 h-10 rounded-2xl bg-stone-200/60 dark:bg-stone-800/60 flex items-center justify-center text-stone-800 dark:text-stone-200 mb-6">
+                  <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+                <div class="font-mono text-xs text-stone-400 dark:text-stone-500 tracking-wider mb-2">02 / ARCHITECTURE</div>
+                <h3 class="font-serif text-2xl text-stone-900 dark:text-stone-100 mb-4 font-medium">工程与系统架构</h3>
+                <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed mb-6 font-sans">
+                  严苛遵循高内聚低耦合准则构建企业级原子设计系统。让跨平台复杂状态在确定性的有限状态机管道中静默流淌。
+                </p>
+              </div>
+
+              <div class="relative z-10 pt-6 border-t border-stone-200/50 dark:border-stone-800/50 flex flex-wrap gap-2">
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Design Tokens AST</span>
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Headless State Machines</span>
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Sub-pixel Layout</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 卡片 3: 图形与实验交互 -->
+          <div class="w-[86vw] sm:w-[380px] lg:w-[420px] flex-shrink-0 snap-start">
+            <div class="liquid-glass-card p-8 sm:p-9 h-full flex flex-col justify-between" data-card-sound="crystal">
+              <div class="liquid-glass-glow"></div>
+              <div class="liquid-sheen-wave"></div>
+
+              <div class="relative z-10">
+                <div class="w-10 h-10 rounded-2xl bg-stone-200/60 dark:bg-stone-800/60 flex items-center justify-center text-stone-800 dark:text-stone-200 mb-6">
+                  <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+                <div class="font-mono text-xs text-stone-400 dark:text-stone-500 tracking-wider mb-2">03 / COMPUTATION</div>
+                <h3 class="font-serif text-2xl text-stone-900 dark:text-stone-100 mb-4 font-medium">图形与实验交互</h3>
+                <p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed mb-6 font-sans">
+                  驾驭 WebGL、WebGPU 与流体着色器数学算法，构建超越平面维度的沉浸式空间界面与自适应数学透视雕塑。
+                </p>
+              </div>
+
+              <div class="relative z-10 pt-6 border-t border-stone-200/50 dark:border-stone-800/50 flex flex-wrap gap-2">
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Custom GLSL Shaders</span>
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Spatial Matrix 3D</span>
+                <span class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-stone-100/80 dark:bg-stone-800/80 text-stone-600 dark:text-stone-300">Particle Gravity Sim</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 精选作品板块 (Selected Works: 水平滑动案例画廊) -->
+    <!-- ============================================================ -->
+    <section id="works" class="py-20 sm:py-28 relative overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        
+        <!-- 章节标头与水平滑动控件 -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-stone-200/60 dark:border-stone-800/60 scroll-flow-item">
+          <div>
+            <div class="font-mono text-xs tracking-widest text-stone-400 dark:text-stone-500 uppercase mb-3">
+              03 / WORKS
+            </div>
+            <h2 class="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-stone-100 font-normal">
+              精选落地实践
+            </h2>
+          </div>
+          <div class="flex items-center gap-5 mt-4 md:mt-0">
+            <span class="text-xs font-sans text-stone-400 dark:text-stone-500 hidden sm:inline">← 可拖拽或左右滑动案例 →</span>
+            <div class="flex items-center gap-2 font-mono text-xs text-stone-500">
+              <span id="works-slider-indicator" class="text-[11px] text-stone-400 mr-1 select-none">01 / 03</span>
+              <button id="works-slider-prev" class="w-8 h-8 rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-500 flex items-center justify-center transition-all focus:outline-none" aria-label="向左滑动">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button id="works-slider-next" class="w-8 h-8 rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-500 flex items-center justify-center transition-all focus:outline-none" aria-label="向右滑动">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 水平滑动作品画廊 (Horizontal Slider Track) -->
+        <div id="works-slider" class="horizontal-slider flex gap-8 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-4 cursor-grab">
+
+          <!-- 案例 1: 空间数字建筑展厅 -->
+          <article class="w-[90vw] sm:w-[740px] lg:w-[880px] flex-shrink-0 snap-center liquid-glass-card p-8 sm:p-12" data-card-sound="pulse">
+            <div class="liquid-glass-glow"></div>
+            <div class="liquid-sheen-wave"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+              <div class="lg:col-span-7 space-y-5">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-stone-400 dark:text-stone-500 tracking-wider">01 · ARCHITECTURE & WEBGL</span>
+                  <span class="w-1 h-1 rounded-full bg-stone-300 dark:bg-stone-700"></span>
+                  <span class="text-xs font-mono text-stone-500 dark:text-stone-400">2024</span>
+                </div>
+                <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-stone-900 dark:text-stone-100 font-normal">
+                  Aether · 空间数字建筑展厅
+                </h3>
+                <p class="text-stone-600 dark:text-stone-300 font-sans text-sm sm:text-base leading-relaxed">
+                  为独立建筑设计事务所构建的全景纯白空间展陈。运用定制 WebGL 着色器模拟日光于石膏肌理上的漫反射物理折射，将实体建筑模型的空间透视无缝映射至视口双轴滚动中。
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Three.js</span>
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Custom GLSL</span>
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Optical Camera Rig</span>
+                </div>
+                <div class="pt-3">
+                  <button class="project-detail-btn inline-flex items-center gap-2 text-sm font-medium text-stone-800 dark:text-stone-200 hover:text-stone-950 dark:hover:text-white transition-colors" data-project="aether">
+                    <span>阅读设计与工程复盘</span>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 交互式微微缩预览视口 (交互式日光投射与建筑阴影沙盘) -->
+              <div id="aether-interactive-box" class="lg:col-span-5 aspect-[4/3] rounded-xl bg-stone-200/40 dark:bg-stone-900/60 border border-stone-200/60 dark:border-stone-800/60 overflow-hidden relative group parallax-media cursor-crosshair" data-parallax-rate="0.12">
+                <canvas id="canvas-aether" class="w-full h-full block"></canvas>
+                <div class="absolute top-3 left-3 text-[10px] font-mono text-stone-400 dark:text-stone-500 bg-stone-100/80 dark:bg-stone-800/80 px-2.5 py-1 rounded-md backdrop-blur-sm pointer-events-none flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                  <span id="aether-sun-readout">日光入射角: 45°</span>
+                </div>
+                <div class="absolute bottom-3 right-3 text-[10px] font-mono text-stone-400 dark:text-stone-500 bg-stone-100/80 dark:bg-stone-800/80 px-2.5 py-1 rounded-md backdrop-blur-sm pointer-events-none">
+                  鼠标在区域内滑动可引导实时光影
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 案例 2: 触觉排版实验工具 -->
+          <article class="w-[90vw] sm:w-[740px] lg:w-[880px] flex-shrink-0 snap-center liquid-glass-card p-8 sm:p-12" data-card-sound="metal">
+            <div class="liquid-glass-glow"></div>
+            <div class="liquid-sheen-wave"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+              <div class="lg:col-span-7 space-y-5">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-stone-400 dark:text-stone-500 tracking-wider">02 · TYPOGRAPHY ENGINE</span>
+                  <span class="w-1 h-1 rounded-full bg-stone-300 dark:bg-stone-700"></span>
+                  <span class="text-xs font-mono text-stone-500 dark:text-stone-400">2023</span>
+                </div>
+                <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-stone-900 dark:text-stone-100 font-normal">
+                  Chronos · 触觉动态排印工作室
+                </h3>
+                <p class="text-stone-600 dark:text-stone-300 font-sans text-sm sm:text-base leading-relaxed">
+                  面向数字出版物的可变字体交互工作台。为多语种西文衬线与汉字字形注入物理空气阻尼，排字工人拖拽网格时可感知机械活字印版的微弹簧回弹与阻抗力。
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Variable Fonts API</span>
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Spring Physics FSM</span>
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Canvas Rasterizer</span>
+                </div>
+                <div class="pt-3">
+                  <button class="project-detail-btn inline-flex items-center gap-2 text-sm font-medium text-stone-800 dark:text-stone-200 hover:text-stone-950 dark:hover:text-white transition-colors" data-project="chronos">
+                    <span>阅读设计与工程复盘</span>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 交互式排印阻尼与多语系字模视口 -->
+              <div class="lg:col-span-5 p-6 rounded-xl bg-stone-200/40 dark:bg-stone-900/60 border border-stone-200/60 dark:border-stone-800/60 flex flex-col justify-between parallax-media" data-parallax-rate="-0.10">
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center text-xs font-mono text-stone-500 dark:text-stone-400">
+                    <span>可变排印动态轴 (wght)</span>
+                    <span id="font-axis-val">450 · 64pt</span>
+                  </div>
+                  
+                  <!-- 字模语系切换胶囊与自定义输入 -->
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex gap-1.5 p-1 rounded-lg bg-stone-200/60 dark:bg-stone-800/60 text-[11px] font-mono">
+                      <button class="font-sample-btn px-2.5 py-1 rounded-md bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-xs" data-sample="latin">Latin</button>
+                      <button class="font-sample-btn px-2.5 py-1 rounded-md text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100" data-sample="cjk">汉字活字</button>
+                      <button class="font-sample-btn px-2.5 py-1 rounded-md text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100" data-sample="mono">Code</button>
+                    </div>
+                    <button id="copy-font-token-btn" class="text-[10px] font-mono text-stone-500 hover:text-stone-900 dark:hover:text-stone-100 px-2 py-1 rounded border border-stone-300 dark:border-stone-700 hover:border-stone-400 transition-colors flex items-center gap-1" title="复制当前字重 CSS">
+                      <i data-lucide="copy" class="w-3 h-3"></i>
+                      <span>复制 CSS</span>
+                    </button>
+                  </div>
+
+                  <div id="interactive-type-preview" class="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-stone-100 py-4 text-center select-none tracking-tight transition-all h-20 flex items-center justify-center" style="font-weight: 450;" contenteditable="true" spellcheck="false" title="可直接点击编辑测试文本">
+                    Amplitūdo
+                  </div>
+                </div>
+
+                <div class="space-y-2 pt-3 border-t border-stone-200/50 dark:border-stone-800/50">
+                  <div class="flex justify-between text-[11px] font-mono text-stone-400">
+                    <span>机械阻抗滑杆</span>
+                    <span id="slider-hint">双二阶弹簧解算</span>
+                  </div>
+                  <input id="font-weight-slider" type="range" min="300" max="700" value="450" class="w-full accent-stone-700 dark:accent-stone-300 cursor-pointer">
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- 案例 3: 跨端设计规范原子系统 -->
+          <article class="w-[90vw] sm:w-[740px] lg:w-[880px] flex-shrink-0 snap-center liquid-glass-card p-8 sm:p-12" data-card-sound="pulse">
+            <div class="liquid-glass-glow"></div>
+            <div class="liquid-sheen-wave"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+              <div class="lg:col-span-7 space-y-5">
+                <div class="flex items-center gap-3">
+                  <span class="text-xs font-mono text-stone-400 dark:text-stone-500 tracking-wider">03 · DESIGN SYSTEMS</span>
+                  <span class="w-1 h-1 rounded-full bg-stone-300 dark:bg-stone-700"></span>
+                  <span class="text-xs font-mono text-stone-500 dark:text-stone-400">2023</span>
+                </div>
+                <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl text-stone-900 dark:text-stone-100 font-normal">
+                  Modus · 跨端设计规范原子引擎
+                </h3>
+                <p class="text-stone-600 dark:text-stone-300 font-sans text-sm sm:text-base leading-relaxed">
+                  为跨国协作团队重构的 Design Tokens 编译器管道。建立符合 W3C 规范的统一语义代币源，通过抽象语法树在 Web、iOS 与 Android 间实现零时差无缝编译。
+                </p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">W3C Design Tokens</span>
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">AST Code Generation</span>
+                  <span class="text-xs font-mono px-3 py-1 rounded-full bg-stone-200/60 dark:bg-stone-800/60 text-stone-700 dark:text-stone-300">Zero Runtime CSS</span>
+                </div>
+                <div class="pt-3">
+                  <button class="project-detail-btn inline-flex items-center gap-2 text-sm font-medium text-stone-800 dark:text-stone-200 hover:text-stone-950 dark:hover:text-white transition-colors" data-project="modus">
+                    <span>阅读设计与工程复盘</span>
+                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 代币矩阵实时换肤与原子编译卡片 -->
+              <div class="lg:col-span-5 p-6 rounded-xl bg-stone-200/40 dark:bg-stone-900/60 border border-stone-200/60 dark:border-stone-800/60 font-mono text-xs space-y-3 parallax-media" data-parallax-rate="0.10">
+                <div class="flex justify-between items-center text-stone-400 pb-2 border-b border-stone-200/50 dark:border-stone-800/50">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>token.pipeline.ts</span>
+                  </div>
+                  <span id="token-compile-status" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-sans">AST 校验通过</span>
+                </div>
+                <div id="token-code-lines" class="space-y-1.5 text-stone-600 dark:text-stone-300 transition-all duration-300">
+                  <div><span class="text-stone-400">$theme-accent-color:</span> <span id="token-color-val" class="font-bold text-stone-800 dark:text-stone-100">#8E6E65</span>;</div>
+                  <div><span class="text-stone-400">$glass-dispersion:</span> blur(24px) sat(180%);</div>
+                  <div><span class="text-stone-400">$physics-stiffness:</span> 180;</div>
+                  <div><span class="text-stone-400">$target-platforms:</span> [web, ios, android];</div>
+                </div>
+                <div class="pt-3 flex gap-2">
+                  <button id="token-test-btn" class="flex-1 py-2 rounded-lg bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white transition-all text-[11px] font-sans font-medium flex items-center justify-center gap-1.5 shadow-sm active:scale-98">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    <span>模拟多端原子编译</span>
+                  </button>
+                  <button id="copy-token-btn" class="px-3 py-2 rounded-lg border border-stone-300 dark:border-stone-700 hover:border-stone-500 text-stone-700 dark:text-stone-300 transition-all text-[11px] font-mono flex items-center gap-1" title="复制当前 Token 代码">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                    <span>Token</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 持续历程板块 (Continuous Journey: 清晰通透时序画廊，彻底剔除任何模糊与卡顿) -->
+    <!-- ============================================================ -->
+    <section id="journey" class="py-24 sm:py-32 relative">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        
+        <!-- 章节标头 -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 pb-6 border-b border-stone-200/60 dark:border-stone-800/60 scroll-flow-item">
+          <div>
+            <div class="font-mono text-xs tracking-widest text-stone-400 dark:text-stone-500 uppercase mb-3">
+              04 / TRAJECTORY
+            </div>
+            <h2 class="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-stone-100 font-normal">
+              持续演进的轨迹
+            </h2>
+          </div>
+          <p class="font-sans text-sm text-stone-500 dark:text-stone-400 mt-4 md:mt-0 max-w-sm">
+            于秩序与创新之间，沉淀出有厚度的人文工程经验。
+          </p>
+        </div>
+
+        <!-- 3 张独立平滑时序卡片 (垂直时序流，100% 完整清晰呈现，零模糊，零遮挡) -->
+        <div id="stacking-deck-container" class="relative space-y-10 sm:space-y-12 pl-4 sm:pl-8 border-l border-stone-300/80 dark:border-stone-700/80 ml-2 sm:ml-4">
+          
+          <!-- 阶段 03 -->
+          <div class="relative scroll-flow-item">
+            <div class="absolute -left-[21px] sm:-left-[37px] top-9 w-3 h-3 rounded-full bg-stone-800 dark:bg-stone-200 ring-4 ring-[#FAF8F6] dark:ring-[#131212]"></div>
+            
+            <div class="liquid-glass-card p-8 sm:p-11" data-card-sound="wood">
+              <div class="liquid-glass-glow"></div>
+              <div class="liquid-sheen-wave"></div>
+              <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-baseline gap-4 mb-5 border-b border-stone-200/50 dark:border-stone-800/50 pb-4">
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wider">PHASE 03</span>
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <h3 class="font-serif text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 font-normal">独立前瞻设计工程师 & 顾问</h3>
+                </div>
+                <span class="font-mono text-xs sm:text-sm px-3.5 py-1 rounded-full bg-stone-200/70 dark:bg-stone-800/80 text-stone-800 dark:text-stone-200 font-medium shadow-sm">2024 — 至今</span>
+              </div>
+              <p class="text-stone-600 dark:text-stone-300 font-sans text-sm sm:text-base leading-relaxed mb-6 max-w-3xl">
+                为高定文化机构、前瞻硬件品牌与创新科技团队提供设计系统与核心交互架构咨询。主导次世代空间视差计算、低功耗流体微渲染与多端设计代币管道工程落地。
+              </p>
+              <div class="flex flex-wrap gap-2 pt-2">
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">空间视差渲染</span>
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">Tokens AST 管道</span>
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">物理触觉微排印</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 阶段 02 -->
+          <div class="relative scroll-flow-item">
+            <div class="absolute -left-[21px] sm:-left-[37px] top-9 w-3 h-3 rounded-full bg-stone-600 dark:bg-stone-400 ring-4 ring-[#FAF8F6] dark:ring-[#131212]"></div>
+            
+            <div class="liquid-glass-card p-8 sm:p-11" data-card-sound="crystal">
+              <div class="liquid-glass-glow"></div>
+              <div class="liquid-sheen-wave"></div>
+              <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-baseline gap-4 mb-5 border-b border-stone-200/50 dark:border-stone-800/50 pb-4">
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wider">PHASE 02</span>
+                  <h3 class="font-serif text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 font-normal">首席设计技师 (Principal Design Technologist)</h3>
+                </div>
+                <span class="font-mono text-xs sm:text-sm px-3.5 py-1 rounded-full bg-stone-200/70 dark:bg-stone-800/80 text-stone-800 dark:text-stone-200 font-medium shadow-sm">2021 — 2024</span>
+              </div>
+              <p class="text-stone-600 dark:text-stone-300 font-sans text-sm sm:text-base leading-relaxed mb-6 max-w-3xl">
+                主导跨国核心业务体验架构演进。连接工业设计哲学与现代前端工程实践，建立端到端无缝协作基建，推动微前端状态解耦与全链路无障碍标准建立。
+              </p>
+              <div class="flex flex-wrap gap-2 pt-2">
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">核心基建重构</span>
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">无障碍设计标准</span>
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">微前端解耦</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 阶段 01 -->
+          <div class="relative scroll-flow-item">
+            <div class="absolute -left-[21px] sm:-left-[37px] top-9 w-3 h-3 rounded-full bg-stone-500 dark:bg-stone-500 ring-4 ring-[#FAF8F6] dark:ring-[#131212]"></div>
+            
+            <div class="liquid-glass-card p-8 sm:p-11" data-card-sound="wood">
+              <div class="liquid-glass-glow"></div>
+              <div class="liquid-sheen-wave"></div>
+              <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-baseline gap-4 mb-5 border-b border-stone-200/50 dark:border-stone-800/50 pb-4">
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wider">PHASE 01</span>
+                  <h3 class="font-serif text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 font-normal">资深前端架构师 (Senior Frontend Architect)</h3>
+                </div>
+                <span class="font-mono text-xs sm:text-sm px-3.5 py-1 rounded-full bg-stone-200/70 dark:bg-stone-800/80 text-stone-800 dark:text-stone-200 font-medium shadow-sm">2018 — 2021</span>
+              </div>
+              <p class="text-stone-600 dark:text-stone-300 font-sans text-sm sm:text-base leading-relaxed mb-6 max-w-3xl">
+                负责旗舰级产品官方主页与设计工具的底层引擎研发。通过细致入微的亚像素网格与 GPU 加速图层，奠定了沉浸式物理交互的基础技术基石。
+              </p>
+              <div class="flex flex-wrap gap-2 pt-2">
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">旗舰官网动效</span>
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">GPU 硬件加速</span>
+                <span class="text-xs font-mono px-3 py-1 rounded-md bg-stone-100/90 dark:bg-stone-800/90 text-stone-600 dark:text-stone-300">亚像素排版</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 沉静合作横幅 (Quiet Collaboration Banner) -->
+    <!-- ============================================================ -->
+    <section id="contact" class="py-20 sm:py-28 relative">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div class="liquid-glass-card scroll-flow-item p-10 sm:p-16 text-center relative overflow-hidden" data-card-sound="crystal">
+          <div class="liquid-glass-glow"></div>
+          <div class="liquid-sheen-wave"></div>
+
+          <div class="relative z-10 max-w-2xl mx-auto space-y-6">
+            <div class="font-mono text-xs tracking-ultra text-stone-400 dark:text-stone-500 uppercase">
+              COLLABORATION
+            </div>
+            <h2 class="font-serif text-3xl sm:text-5xl text-stone-900 dark:text-stone-50 font-normal leading-tight">
+              探讨有分量的事物。
+            </h2>
+            <p class="font-sans text-sm sm:text-base text-stone-600 dark:text-stone-300 leading-relaxed">
+              无论是构建高精度的产品架构，还是探寻触觉界面的美学边界，随时开启关于下一代数字体验的探讨与委托。
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+              <button id="banner-contact-btn" class="w-full sm:w-auto px-8 py-3.5 text-sm font-medium rounded-full bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 hover:bg-stone-800 dark:hover:bg-white transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98]">
+                发起委托对话
+              </button>
+              <button id="copy-email-btn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-mono rounded-full border border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-stone-400 dark:hover:border-stone-500 transition-colors">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+                <span id="copy-email-text">alex.chen.studio@domain.com</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 系统状态页脚 (System Status Footer & Controls) -->
+    <!-- ============================================================ -->
+    <footer class="w-full relative z-20 pb-12 pt-6 border-t border-stone-200/50 dark:border-stone-800/50 text-stone-500 dark:text-stone-400 font-mono text-xs">
+      <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6 py-4">
+          
+          <!-- 系统运行环境与实时时间 -->
+          <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+            <span class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>V8 / Chromium · WebGL 2.0</span>
+            </span>
+            <span class="text-stone-300 dark:text-stone-700">/</span>
+            <span id="live-clock">UTC+8 --:--:--</span>
+          </div>
+
+          <!-- 状态栏操作开关：网格开关、骨架屏演示、快捷键控制台 -->
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <button id="toggle-grid-btn" class="px-3 py-1 rounded-md border border-stone-300/70 dark:border-stone-700/70 hover:border-stone-400 dark:hover:border-stone-500 transition-colors flex items-center gap-1.5 focus:outline-none">
+              <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+              <span id="grid-status-text">12 栏模数: 隐形</span>
+            </button>
+            
+            <button id="replay-skeleton-btn" class="px-3 py-1 rounded-md border border-stone-300/70 dark:border-stone-700/70 hover:border-stone-400 dark:hover:border-stone-500 transition-colors flex items-center gap-1.5 focus:outline-none">
+              <i data-lucide="play" class="w-3.5 h-3.5"></i>
+              <span>骨架屏演示</span>
+            </button>
+
+            <button id="open-cmd-hud-btn" class="px-3 py-1 rounded-md border border-stone-300/70 dark:border-stone-700/70 hover:border-stone-400 dark:hover:border-stone-500 transition-colors flex items-center gap-1.5 focus:outline-none" title="按 ? 键随时唤起">
+              <i data-lucide="command" class="w-3.5 h-3.5"></i>
+              <span>快捷指令 [?]</span>
+            </button>
+          </div>
+
+          <!-- 署名与版权 -->
+          <div class="text-center lg:text-right text-[11px] text-stone-400 dark:text-stone-500">
+            © 2026 Alex Chen · Studio. 纯粹有度。
+          </div>
+
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+    <!-- ============================================================ -->
+  <!-- 全局快捷键与指挥中心 HUD (Command Center HUD) -->
+  <!-- ============================================================ -->
+  <div id="cmd-hud-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="cmd-hud-title">
+    <div class="modal-backdrop fixed inset-0" id="cmd-hud-backdrop"></div>
+    <div class="liquid-glass-card max-w-md w-full p-6 sm:p-8 relative z-10 shadow-2xl space-y-5">
+      <div class="flex items-center justify-between border-b border-stone-200/50 dark:border-stone-800/50 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="terminal" class="w-4 h-4 text-stone-500"></i>
+          <h3 id="cmd-hud-title" class="font-mono text-xs text-stone-900 dark:text-stone-100 font-medium tracking-wider uppercase">Studio Command Center</h3>
+        </div>
+        <button id="close-cmd-hud-btn" class="p-1.5 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 focus:outline-none" aria-label="关闭控制台">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2 font-mono text-xs">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-stone-100/60 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300">
+          <span>切换 4/8/12 栏响应式模数</span>
+          <kbd class="px-2 py-0.5 rounded bg-white dark:bg-stone-700 shadow-xs border border-stone-200 dark:border-stone-600 font-bold">G</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-stone-100/60 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300">
+          <span>切换莫兰迪晨霜 / 暗夜色阶</span>
+          <kbd class="px-2 py-0.5 rounded bg-white dark:bg-stone-700 shadow-xs border border-stone-200 dark:border-stone-600 font-bold">T</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-stone-100/60 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300">
+          <span>多频物理触觉微音效静音/开启</span>
+          <kbd class="px-2 py-0.5 rounded bg-white dark:bg-stone-700 shadow-xs border border-stone-200 dark:border-stone-600 font-bold">M</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-stone-100/60 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300">
+          <span>调起项目委托与咨询信道</span>
+          <kbd class="px-2 py-0.5 rounded bg-white dark:bg-stone-700 shadow-xs border border-stone-200 dark:border-stone-600 font-bold">C</kbd>
+        </div>
+        <div class="flex items-center justify-between p-2 rounded-lg bg-stone-100/60 dark:bg-stone-800/50 text-stone-700 dark:text-stone-300">
+          <span>唤起 / 关闭本控制台</span>
+          <kbd class="px-2 py-0.5 rounded bg-white dark:bg-stone-700 shadow-xs border border-stone-200 dark:border-stone-600 font-bold">?</kbd>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-stone-200/50 dark:border-stone-800/50 flex justify-between items-center text-[11px] text-stone-500">
+        <span>数字键章节直达</span>
+        <div class="flex gap-1 font-mono text-[10px]">
+          <kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600">1 哲学</kbd>
+          <kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600">2 领域</kbd>
+          <kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600">3 作品</kbd>
+          <kbd class="px-1.5 py-0.5 rounded bg-white dark:bg-stone-700 border border-stone-200 dark:border-stone-600">4 轨迹</kbd>
+        </div>
+      </div>
+      <div class="text-[11px] text-stone-400 font-sans text-center pt-1">
+        在页面任意区域直接按下对应按键即可生效
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 模态弹窗系统：联络委托模态框 -->
+  <!-- ============================================================ -->
+  <div id="contact-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <div class="modal-backdrop fixed inset-0" id="contact-modal-backdrop"></div>
+    
+    <div class="liquid-glass-card max-w-lg w-full p-8 sm:p-10 relative z-10 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b border-stone-200/50 dark:border-stone-800/50 pb-4">
+        <div>
+          <span class="font-mono text-xs text-stone-400 tracking-wider">PROJECT INQUIRY</span>
+          <h3 id="contact-modal-title" class="font-serif text-2xl text-stone-900 dark:text-stone-100 font-normal">发起委托对话</h3>
+        </div>
+        <button id="close-contact-modal-btn" class="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 focus:outline-none" aria-label="关闭对话框">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="contact-form" class="space-y-4 font-sans text-sm">
+        <div>
+          <label for="contact-name" class="block text-xs font-mono text-stone-500 dark:text-stone-400 mb-1">您的称谓 / 机构名</label>
+          <input type="text" id="contact-name" required placeholder="如：林先生 / 空间工作室" class="w-full px-4 py-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400 dark:focus:border-stone-500">
+        </div>
+
+        <div>
+          <label for="contact-email" class="block text-xs font-mono text-stone-500 dark:text-stone-400 mb-1">联络邮箱</label>
+          <input type="email" id="contact-email" required placeholder="name@domain.com" class="w-full px-4 py-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400 dark:focus:border-stone-500">
+        </div>
+
+        <div>
+          <label for="contact-category" class="block text-xs font-mono text-stone-500 dark:text-stone-400 mb-1">委托类型</label>
+          <select id="contact-category" class="w-full px-4 py-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400 dark:focus:border-stone-500">
+            <option value="arch">前瞻产品架构设计与咨询</option>
+            <option value="tactile">触觉物理微交互与 WebGL 展陈</option>
+            <option value="tokens">企业级 Design Tokens 系统重构</option>
+            <option value="other">其他深度战略合作</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="contact-message" class="block text-xs font-mono text-stone-500 dark:text-stone-400 mb-1">项目简述与期望周期</label>
+          <textarea id="contact-message" rows="3" required placeholder="简要说明您的项目背景与关键诉求..." class="w-full px-4 py-2.5 rounded-xl bg-stone-100/70 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:border-stone-400 dark:focus:border-stone-500 resize-none"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 font-medium hover:bg-stone-800 dark:hover:bg-white transition-colors flex items-center justify-center gap-2">
+          <span>投递委托</span>
+          <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 模态弹窗系统：简历档案预览模态框 -->
+  <!-- ============================================================ -->
+  <div id="resume-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="resume-modal-title">
+    <div class="modal-backdrop fixed inset-0" id="resume-modal-backdrop"></div>
+    
+    <div class="liquid-glass-card max-w-lg w-full p-8 sm:p-10 relative z-10 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b border-stone-200/50 dark:border-stone-800/50 pb-4">
+        <div>
+          <span class="font-mono text-xs text-stone-400 tracking-wider">CURRICULUM VITAE</span>
+          <h3 id="resume-modal-title" class="font-serif text-2xl text-stone-900 dark:text-stone-100 font-normal">Alex Chen · 简历档案</h3>
+        </div>
+        <button id="close-resume-modal-btn" class="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 focus:outline-none" aria-label="关闭简历预览">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 font-sans text-sm text-stone-600 dark:text-stone-300">
+        <p class="leading-relaxed">
+          这份档案记录了过去 8 年中关于企业级前端架构重构、物理触觉微排印引擎、设计代币规范以及 WebGL 空间展厅的系统性沉淀。
+        </p>
+        <div class="p-4 rounded-xl bg-stone-200/40 dark:bg-stone-800/50 border border-stone-200/60 dark:border-stone-700/60 font-mono text-xs space-y-2">
+          <div class="flex justify-between">
+            <span class="text-stone-400">格式:</span>
+            <span>PDF (A4 打印优化排版)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-400">页数:</span>
+            <span>2 Pages · 极致克制版</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-400">更新状态:</span>
+            <span>2026 Q4 · 现行有效</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button id="download-resume-file-btn" class="flex-1 py-3 rounded-xl bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 font-medium hover:bg-stone-800 dark:hover:bg-white transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>下载档案 (PDF)</span>
+        </button>
+        <button id="cancel-resume-btn" class="px-5 py-3 rounded-xl border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-stone-400 transition-colors">
+          关闭
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 模态弹窗系统：案例深度复盘模态框 -->
+  <!-- ============================================================ -->
+  <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+    <div class="modal-backdrop fixed inset-0" id="project-modal-backdrop"></div>
+    
+    <div class="liquid-glass-card max-w-2xl w-full p-8 sm:p-10 relative z-10 shadow-2xl max-h-[85vh] overflow-y-auto space-y-6">
+      <div class="flex items-center justify-between border-b border-stone-200/50 dark:border-stone-800/50 pb-4">
+        <div>
+          <span id="project-modal-tag" class="font-mono text-xs text-stone-400 tracking-wider">PROJECT CASE STUDY</span>
+          <h3 id="project-modal-title" class="font-serif text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 font-normal">案例工程与设计复盘</h3>
+        </div>
+        <button id="close-project-modal-btn" class="p-2 text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 focus:outline-none" aria-label="关闭案例复盘">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="project-modal-content" class="space-y-4 font-sans text-sm text-stone-600 dark:text-stone-300 leading-relaxed">
+        <!-- 动态注入案例内容 -->
+      </div>
+
+      <div class="pt-4 border-t border-stone-200/50 dark:border-stone-800/50 flex justify-end">
+        <button id="dismiss-project-modal-btn" class="px-6 py-2 rounded-full bg-stone-900 text-stone-100 dark:bg-stone-100 dark:text-stone-900 font-medium text-xs hover:opacity-90 transition-opacity">
+          完成阅读
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- 轻量全局 Toast 通知容器 -->
+  <!-- ============================================================ -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ============================================================ -->
+  <!-- 原生 JavaScript 交互与物理动效引擎 -->
+  <!-- ============================================================ -->
+  <script>
+    (function () {
+      'use strict';
+
+      // ==========================================
+      // 1. 全局配置与色阶定义 (Morandi Palette Progression)
+      // ==========================================
+      const LIGHT_STOPS = [
+        { pct: 0.00, r: 250, g: 248, b: 246 }, // 晨霜白露 #FAF8F6
+        { pct: 0.25, r: 244, g: 236, b: 232 }, // 浅肉桂微雾 #F4ECE8
+        { pct: 0.50, r: 234, g: 219, b: 218 }, // 莫兰迪灰粉 #EADBDA
+        { pct: 0.75, r: 223, g: 202, b: 202 }, // 羊绒陶土 #DFCACA
+        { pct: 1.00, r: 201, g: 178, b: 172 }, // 雪松肉桂 #C9B2AC
+      ];
+
+      const DARK_STOPS = [
+        { pct: 0.00, r: 19, g: 18, b: 18 },    // 暗夜墨黑 #131212
+        { pct: 0.25, r: 26, g: 22, b: 22 },    // 冷肉桂黑 #1A1616
+        { pct: 0.50, r: 36, g: 29, b: 29 },    // 暗酒红灰 #241D1D
+        { pct: 0.75, r: 43, g: 33, b: 32 },    // 暮色陶灰 #2B2120
+        { pct: 1.00, r: 30, g: 23, b: 22 },    // 深沉雪松 #1E1716
+      ];
+
+      let isDarkMode = false;
+      let isAudioEnabled = true;
+      let isGridVisible = false;
+      let audioCtx = null;
+      let scrollTicking = false;
+
+      // ==========================================
+      // 2. Web Audio API 物理触觉微音效合成器
+      // ==========================================
+      function initAudio() {
+        if (!audioCtx && typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined') {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      // 多频触觉微声学合成器 (Polyphonic Micro-Acoustics Engine)
+      function playTactileTick(type) {
+        if (!isAudioEnabled) return;
+        try {
+          initAudio();
+          if (!audioCtx) return;
+
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          if (type === 'wood') {
+            // 建筑与实木质感 (~360Hz-160Hz 饱满衰减)
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(360, now);
+            osc.frequency.exponentialRampToValueAtTime(160, now + 0.048);
+            gain.gain.setValueAtTime(0.045, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.048);
+            osc.start(now);
+            osc.stop(now + 0.05);
+          } else if (type === 'metal') {
+            // 排印字模与金属晶体 (~1140Hz-720Hz 清脆机械敲击)
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(1140, now);
+            osc.frequency.exponentialRampToValueAtTime(720, now + 0.036);
+            gain.gain.setValueAtTime(0.035, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.036);
+            osc.start(now);
+            osc.stop(now + 0.038);
+          } else if (type === 'pulse') {
+            // 系统代币与编译器脉冲 (~1680Hz 高频微脉冲)
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1680, now);
+            osc.frequency.exponentialRampToValueAtTime(940, now + 0.024);
+            gain.gain.setValueAtTime(0.025, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
+            osc.start(now);
+            osc.stop(now + 0.026);
+          } else if (type === 'dock') {
+            // 卡片层叠锁紧声 (~480Hz 磁吸卡扣)
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(480, now);
+            osc.frequency.exponentialRampToValueAtTime(240, now + 0.042);
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.042);
+            osc.start(now);
+            osc.stop(now + 0.044);
+          } else {
+            // 水晶微滴触感 (标准微触)
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(980, now);
+            osc.frequency.exponentialRampToValueAtTime(760, now + 0.045);
+            gain.gain.setValueAtTime(0.03, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+            osc.start(now);
+            osc.stop(now + 0.046);
+          }
+        } catch (e) {
+          // 静默容错
+        }
+      }
+
+      // ==========================================
+      // 3. 数学 RGB 插值滚动色阶引擎
+      // ==========================================
+      function interpolateColor(stops, fraction) {
+        const clamped = Math.max(0, Math.min(1, fraction));
+        let start = stops[0];
+        let end = stops[stops.length - 1];
+
+        for (let i = 0; i < stops.length - 1; i++) {
+          if (clamped >= stops[i].pct && clamped <= stops[i + 1].pct) {
+            start = stops[i];
+            end = stops[i + 1];
+            break;
+          }
+        }
+
+        const range = end.pct - start.pct;
+        const localT = range === 0 ? 0 : (clamped - start.pct) / range;
+
+        const r = Math.round(start.r + (end.r - start.r) * localT);
+        const g = Math.round(start.g + (end.g - start.g) * localT);
+        const b = Math.round(start.b + (end.b - start.b) * localT);
+
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+
+      // ==========================================
+      // 4. 苹果级多深度连续视差与柔性阻尼 LERP 物理引擎
+      // ==========================================
+      let targetScrollY = window.pageYOffset || 0;
+      let currentScrollY = targetScrollY;
+      let isLerpRunning = false;
+
+      function updateScrollScrub(smoothY) {
+        const windowHeight = window.innerHeight || 800;
+        const scrollY = typeof smoothY === 'number' ? smoothY : (window.pageYOffset || 0);
+        const docHeight = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        ) - windowHeight;
+
+        const scrollProgress = docHeight > 0 ? scrollY / docHeight : 0;
+
+        // 1. 背景色逐像素数学平滑插值 (Morandi Color Scrub)
+        const activeStops = isDarkMode ? DARK_STOPS : LIGHT_STOPS;
+        const currentColor = interpolateColor(activeStops, scrollProgress);
+        document.body.style.backgroundColor = currentColor;
+
+        // 2. 首屏自然流平滑递减交接 (Natural Spatial Handoff)
+        // 彻底解决空屏与重叠：首屏随滑动自然向上轻移淡出，在视口顶部平滑溶出，与下方板块无缝衔接
+        const heroContent = document.getElementById('hero-content');
+        const eyebrow = document.getElementById('hero-eyebrow');
+        const title = document.getElementById('hero-title');
+        const subtitle = document.getElementById('hero-subtitle');
+        const actions = document.getElementById('hero-actions');
+        const scrollIndicator = document.getElementById('hero-scroll-indicator');
+
+        // 首屏透明度自然过渡区间 (0px -> 420px)，全程绝无空屏！
+        // scrollY = 0 时为 1.0；scrollY = 200 时为 0.52 (依然清晰可见)；scrollY >= 420 时完全在视口上方溶出
+        const heroOpacity = Math.max(0, 1 - (scrollY / 420));
+
+        if (heroContent) {
+          if (heroOpacity <= 0.005) {
+            heroContent.style.opacity = '0';
+            heroContent.style.visibility = 'hidden';
+            heroContent.style.pointerEvents = 'none';
+          } else {
+            heroContent.style.visibility = 'visible';
+            heroContent.style.pointerEvents = 'auto';
+            heroContent.style.opacity = heroOpacity.toFixed(3);
+          }
+        }
+
+        // 首屏元素微幅向上升腾位移 (-0.08x ~ -0.12x)，沿滚动方向自然离开视口上方，绝不向下撞击下方内容！
+        const heroAscend = -scrollY * 0.09;
+        if (eyebrow) {
+          eyebrow.style.transform = `translate3d(0, ${(heroAscend * 0.7).toFixed(1)}px, 0)`;
+          eyebrow.style.opacity = heroOpacity.toFixed(3);
+        }
+        if (title) {
+          title.style.transform = `translate3d(0, ${(heroAscend * 0.9).toFixed(1)}px, 0)`;
+          title.style.opacity = heroOpacity.toFixed(3);
+        }
+        if (subtitle) {
+          subtitle.style.transform = `translate3d(0, ${(heroAscend * 1.1).toFixed(1)}px, 0)`;
+          subtitle.style.opacity = heroOpacity.toFixed(3);
+        }
+        if (actions) {
+          actions.style.transform = `translate3d(0, ${(heroAscend * 1.3).toFixed(1)}px, 0)`;
+          actions.style.opacity = heroOpacity.toFixed(3);
+        }
+
+        // 3. 底部下滑探索触控胶囊：滑动时迅速平滑沉降隐退 (80px 内彻底隐去)
+        if (scrollIndicator) {
+          const indOpacity = Math.max(0, 1 - scrollY / 80);
+          scrollIndicator.style.opacity = indOpacity.toFixed(3);
+          scrollIndicator.style.transform = `translate3d(-50%, ${(scrollY * 0.25).toFixed(1)}px, 0)`;
+          scrollIndicator.style.pointerEvents = indOpacity < 0.05 ? 'none' : 'auto';
+        }
+
+        // 4. 背景氛围光球深层视差位移
+        const orb1 = document.getElementById('orb-1');
+        const orb2 = document.getElementById('orb-2');
+        const orb3 = document.getElementById('orb-3');
+        if (orb1) orb1.style.transform = `translate3d(0, ${(scrollY * 0.16).toFixed(1)}px, 0)`;
+        if (orb2) orb2.style.transform = `translate3d(0, ${(-scrollY * 0.12).toFixed(1)}px, 0)`;
+        if (orb3) orb3.style.transform = `translate3d(0, ${(scrollY * 0.20).toFixed(1)}px, 0)`;
+
+        // 4.1 额外板块间流体透镜光斑深层位移
+        const orb4 = document.getElementById('orb-4');
+        const orb5 = document.getElementById('orb-5');
+        if (orb4) orb4.style.transform = `translate3d(0, ${(scrollY * 0.14).toFixed(1)}px, 0)`;
+        if (orb5) orb5.style.transform = `translate3d(0, ${(-scrollY * 0.16).toFixed(1)}px, 0)`;
+
+
+
+        // 6. 3 栏领域能力显著错峰波浪视差 (左右因数 -0.08，中间因数 -0.26，落差达 50px~65px)
+        const isDesktop = window.innerWidth >= 768;
+        const parallaxCols = document.querySelectorAll('.parallax-col');
+        parallaxCols.forEach(col => {
+          if (!isDesktop) {
+            col.style.transform = 'translate3d(0, 0, 0)';
+            return;
+          }
+          const speed = parseFloat(col.getAttribute('data-parallax-speed')) || -0.08;
+          const rect = col.getBoundingClientRect();
+          const offsetFromCenter = rect.top - (windowHeight / 2);
+          // 放宽至 +/-64px，在加大的板块垂直间距下形成极为优美明显的错落波浪
+          const translateY = Math.max(-64, Math.min(64, offsetFromCenter * speed));
+          col.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0)`;
+        });
+
+        // 7. 作品案例图文解耦悬浮视差 (Parallax Media Pedestal)
+        const parallaxMedias = document.querySelectorAll('.parallax-media');
+        parallaxMedias.forEach(media => {
+          if (!isDesktop) {
+            media.style.transform = 'translate3d(0, 0, 0)';
+            return;
+          }
+          const rate = parseFloat(media.getAttribute('data-parallax-rate')) || 0.12;
+          const rect = media.getBoundingClientRect();
+          if (rect.top < windowHeight && rect.bottom > 0) {
+            const offsetCenter = rect.top - (windowHeight / 2);
+            const mediaY = Math.max(-28, Math.min(28, offsetCenter * rate));
+            media.style.transform = `translate3d(0, ${mediaY.toFixed(1)}px, 0)`;
+          }
+        });
+
+        // 8. 双向滚动流态引擎：向下滑动渐入、向上滑动收起 (Bidirectional Reveal & Tuck)
+        const flowItems = document.querySelectorAll('.scroll-flow-item');
+        const enterStart = windowHeight * 0.94;
+        const enterEnd = windowHeight * 0.72;
+        const exitStart = windowHeight * 0.28;
+        const exitEnd = -50;
+
+        flowItems.forEach(item => {
+          const rect = item.getBoundingClientRect();
+          const top = rect.top;
+          const bottom = rect.bottom;
+          let opacity = 1;
+          let translateY = 0;
+          let scale = 1;
+
+          if (top > enterEnd) {
+            // 向下滑动：自下渐入
+            const p = Math.max(0, Math.min(1, (enterStart - top) / (enterStart - enterEnd)));
+            opacity = p;
+            translateY = (1 - p) * 32;
+            scale = 0.97 + (p * 0.03);
+          } else if (bottom < exitStart) {
+            // 向上滑动或离开视口上方：优雅收起
+            const p = Math.max(0, Math.min(1, (bottom - exitEnd) / (exitStart - exitEnd)));
+            opacity = Math.max(0.08, p);
+            translateY = (1 - p) * -24;
+            scale = 0.98 + (p * 0.02);
+          } else {
+            // 居中黄金阅读区
+            opacity = 1;
+            translateY = 0;
+            scale = 1;
+          }
+
+          item.style.opacity = opacity.toFixed(3);
+          // parallax-col 由外层 parallax 精确驱动，其他应用流体入场变换
+          if (!item.classList.contains('parallax-col')) {
+            item.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+          }
+        });
+
+        scrollTicking = false;
+      }
+
+      // LERP (Linear Interpolation) 柔性阻尼平滑动画循环 (含流体环境光速度形变)
+      function lerpParallaxLoop() {
+        const diff = targetScrollY - currentScrollY;
+        // 14% 弹簧柔性阻尼
+        currentScrollY += diff * 0.14;
+
+        // 流体环境光速度响应：根据当前滑动速度动态微拉伸光斑
+        const velocity = Math.abs(diff);
+        const stretchY = Math.min(1.35, 1 + (velocity * 0.0035));
+        const stretchX = 1 / Math.sqrt(stretchY);
+        
+        const orb1 = document.getElementById('orb-1');
+        const orb2 = document.getElementById('orb-2');
+        const orb3 = document.getElementById('orb-3');
+        const orbTransformBase1 = `translate3d(0, ${(currentScrollY * 0.16).toFixed(1)}px, 0)`;
+        const orbTransformBase2 = `translate3d(0, ${(-currentScrollY * 0.12).toFixed(1)}px, 0)`;
+        const orbTransformBase3 = `translate3d(0, ${(currentScrollY * 0.20).toFixed(1)}px, 0)`;
+
+        if (orb1) orb1.style.transform = `${orbTransformBase1} scale(${stretchX.toFixed(3)}, ${stretchY.toFixed(3)})`;
+        if (orb2) orb2.style.transform = `${orbTransformBase2} scale(${stretchX.toFixed(3)}, ${stretchY.toFixed(3)})`;
+        if (orb3) orb3.style.transform = `${orbTransformBase3} scale(${stretchX.toFixed(3)}, ${stretchY.toFixed(3)})`;
+
+        updateScrollScrub(currentScrollY);
+
+        if (Math.abs(diff) > 0.12) {
+          requestAnimationFrame(lerpParallaxLoop);
+        } else {
+          currentScrollY = targetScrollY;
+          updateScrollScrub(currentScrollY);
+          // 速度归零时柔和复原光斑形态
+          if (orb1) orb1.style.transform = `${orbTransformBase1} scale(1, 1)`;
+          if (orb2) orb2.style.transform = `${orbTransformBase2} scale(1, 1)`;
+          if (orb3) orb3.style.transform = `${orbTransformBase3} scale(1, 1)`;
+          isLerpRunning = false;
+        }
+      }
+
+      function onScroll() {
+        targetScrollY = window.pageYOffset || 0;
+        if (!isLerpRunning) {
+          isLerpRunning = true;
+          requestAnimationFrame(lerpParallaxLoop);
+        }
+      }
+
+      // ==========================================
+      // 5. 苹果流动玻璃鼠标透镜高光追踪
+      // ==========================================
+            // ==========================================
+      // 水平滑动卡片画廊引擎 (Horizontal Slider & Drag Mechanics)
+      // ==========================================
+      function setupHorizontalSlider(sliderId, prevBtnId, nextBtnId, indicatorId) {
+        const slider = document.getElementById(sliderId);
+        if (!slider) return;
+        const prevBtn = document.getElementById(prevBtnId);
+        const nextBtn = document.getElementById(nextBtnId);
+        const indicator = document.getElementById(indicatorId);
+
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+        let hasMoved = false;
+
+        slider.addEventListener('mousedown', e => {
+          isDown = true;
+          hasMoved = false;
+          slider.classList.add('cursor-grabbing');
+          startX = e.pageX - slider.offsetLeft;
+          scrollStart = slider.scrollLeft;
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (isDown) {
+            isDown = false;
+            slider.classList.remove('cursor-grabbing');
+            updateControls();
+          }
+        });
+
+        slider.addEventListener('mousemove', e => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - slider.offsetLeft;
+          const walk = (x - startX) * 1.4;
+          slider.scrollLeft = scrollStart - walk;
+          if (Math.abs(walk) > 4) hasMoved = true;
+        });
+
+        slider.addEventListener('click', e => {
+          if (hasMoved) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', () => {
+            const firstCard = slider.firstElementChild;
+            const step = firstCard ? firstCard.offsetWidth + 24 : 380;
+            slider.scrollBy({ left: -step, behavior: 'smooth' });
+            playTactileTick('wood');
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            const firstCard = slider.firstElementChild;
+            const step = firstCard ? firstCard.offsetWidth + 24 : 380;
+            slider.scrollBy({ left: step, behavior: 'smooth' });
+            playTactileTick('wood');
+          });
+        }
+
+        function updateControls() {
+          const maxScroll = slider.scrollWidth - slider.clientWidth;
+          if (prevBtn) {
+            const atStart = slider.scrollLeft <= 8;
+            prevBtn.style.opacity = atStart ? '0.35' : '1';
+            prevBtn.style.pointerEvents = atStart ? 'none' : 'auto';
+          }
+          if (nextBtn) {
+            const atEnd = slider.scrollLeft >= maxScroll - 8;
+            nextBtn.style.opacity = atEnd ? '0.35' : '1';
+            nextBtn.style.pointerEvents = atEnd ? 'none' : 'auto';
+          }
+          if (indicator && slider.children.length > 0) {
+            const total = slider.children.length;
+            const firstCard = slider.firstElementChild;
+            const cardWidth = firstCard ? firstCard.offsetWidth + 24 : 380;
+            const currentIdx = Math.min(total, Math.max(1, Math.round(slider.scrollLeft / cardWidth) + 1));
+            indicator.textContent = `0${currentIdx} / 0${total}`;
+          }
+        }
+
+        slider.addEventListener('scroll', () => {
+          requestAnimationFrame(updateControls);
+        }, { passive: true });
+
+        updateControls();
+      }
+
+      // ==========================================
+      // 5. 苹果流动玻璃：3D 透视俯仰、晶体切边反光与聚焦点环境掩模
+      // ==========================================
+      function setupLiquidGlassCards() {
+        const cards = document.querySelectorAll('.liquid-glass-card');
+        cards.forEach(card => {
+          card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 鼠标透镜高光坐标
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+
+            // 三维空间微透视沙盘俯仰角 (3D Camera Tilt: -3.5deg ~ +3.5deg)
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -3.2;
+            const rotateY = ((x - centerX) / centerX) * 3.2;
+
+            // 动态晶体切边高光入射角
+            const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI) + 90;
+            card.style.setProperty('--bevel-angle', `${angle}deg`);
+
+            // 如果不是被父容器锁定 sticky 的情况，应用 3D 俯仰
+            if (!card.closest('.deck-card-wrapper')) {
+              card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-8px) scale(1.014)`;
+            }
+          });
+
+          card.addEventListener('mouseenter', () => {
+            
+            const soundType = card.getAttribute('data-card-sound') || 'crystal';
+            playTactileTick(soundType);
+          });
+
+          card.addEventListener('mouseleave', () => {
+            
+            if (!card.closest('.deck-card-wrapper')) {
+              card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)';
+            }
+          });
+        });
+      }
+
+      // ==========================================
+      // 6. 模态弹窗管理 (Contact, Resume, Project Detail)
+      // ==========================================
+      // 6. 模态弹窗管理 (经典极简苹果风，纯净无延迟)
+      // ==========================================
+      function showModal(modalEl) {
+        if (!modalEl) return;
+        modalEl.classList.remove('opacity-0', 'pointer-events-none');
+        modalEl.classList.add('opacity-100', 'pointer-events-auto');
+        playTactileTick('wood');
+      }
+
+      // ==========================================
+      // 模态弹窗管理 (经典极简苹果风淡入淡出，干净利落，零冗余延迟)
+      // ==========================================
+      function hideModal(modalEl) {
+        if (!modalEl) return;
+        modalEl.classList.add('opacity-0', 'pointer-events-none');
+        modalEl.classList.remove('opacity-100', 'pointer-events-auto');
+        playTactileTick('crystal');
+      }
+
+      // ==========================================
+      // 7. 轻量 Toast 提示系统
+      // ==========================================
+      function showToast(message, iconName) {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-item';
+        
+        const iconHtml = iconName ? `<i data-lucide="${iconName}" class="w-4 h-4 text-stone-500"></i>` : '';
+        toast.innerHTML = `${iconHtml}<span>${message}</span>`;
+        container.appendChild(toast);
+
+        if (window.lucide) {
+          window.lucide.createIcons({ root: toast });
+        }
+
+        playTactileTick('crystal');
+
+        setTimeout(() => {
+          toast.style.animation = 'toastSlideOut 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 350);
+        }, 3200);
+      }
+
+      // ==========================================
+      // 8. 实时时钟系统 (UTC+8)
+      // ==========================================
+      function startLiveClock() {
+        const clockEl = document.getElementById('live-clock');
+        function update() {
+          if (!clockEl) return;
+          const now = new Date();
+          // 格式化为本地东八区标准时间
+          const options = { timeZone: 'Asia/Shanghai', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+          const timeStr = now.toLocaleTimeString('zh-CN', options);
+          clockEl.textContent = `UTC+8 ${timeStr}`;
+        }
+        update();
+        setInterval(update, 1000);
+      }
+
+      // ==========================================
+      // 9. 案例 1 空间数字建筑 Three.js WebGL 真实 3D 光影沙盘 (Real Three.js WebGL Engine)
+      // ==========================================
+      function initAetherCanvas() {
+        const canvas = document.getElementById('canvas-aether');
+        const box = document.getElementById('aether-interactive-box');
+        const readout = document.getElementById('aether-sun-readout');
+        if (!canvas) return;
+
+        let width = canvas.offsetWidth || 400;
+        let height = canvas.offsetHeight || 300;
+
+        // 如果 Three.js 可用，构建真正的 WebGL 3D 空间建筑几何体与光影
+        if (typeof THREE !== 'undefined') {
+          const scene = new THREE.Scene();
+          const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
+          camera.position.set(2.8, 2.4, 4.2);
+          camera.lookAt(0, 0.1, 0);
+
+          const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+          renderer.setSize(width, height);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+          // 建筑几何群组：由纯白石膏单体、悬挑梁柱与采光中庭构成
+          const group = new THREE.Group();
+          
+          const plasterMaterial = new THREE.MeshStandardMaterial({
+            color: 0xF4ECE8,
+            roughness: 0.85,
+            metalness: 0.05
+          });
+
+          // 核心巨石基座
+          const baseMesh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.8, 1.2), plasterMaterial);
+          baseMesh.position.set(0, 0, 0);
+          group.add(baseMesh);
+
+          // 悬挑顶盖
+          const roofMesh = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.16, 1.8), plasterMaterial);
+          roofMesh.position.set(0.1, 1.0, 0);
+          group.add(roofMesh);
+
+          // 细立柱
+          const columnMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.8, 24), plasterMaterial);
+          columnMesh.position.set(0.9, 0, 0.7);
+          group.add(columnMesh);
+
+          scene.add(group);
+
+          // 环境光与日光定向光流
+          const ambientLight = new THREE.AmbientLight(0xFFFBF5, 0.95);
+          scene.add(ambientLight);
+
+          const sunLight = new THREE.DirectionalLight(0xFFFFFF, 1.8);
+          sunLight.position.set(4, 5, 3);
+          scene.add(sunLight);
+
+          let targetRotX = 0;
+          let targetRotY = 0;
+          let isDragging = false;
+          let prevMouseX = 0;
+          let prevMouseY = 0;
+
+          if (box) {
+            box.addEventListener('mousedown', e => {
+              isDragging = true;
+              prevMouseX = e.clientX;
+              prevMouseY = e.clientY;
+              box.style.cursor = 'grabbing';
+            });
+            window.addEventListener('mouseup', () => {
+              if (isDragging) {
+                isDragging = false;
+                box.style.cursor = 'crosshair';
+              }
+            });
+            box.addEventListener('mousemove', e => {
+              const rect = box.getBoundingClientRect();
+              const mx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+              const my = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+
+              if (isDragging) {
+                const deltaX = e.clientX - prevMouseX;
+                const deltaY = e.clientY - prevMouseY;
+                targetRotY += deltaX * 0.015;
+                targetRotX += deltaY * 0.012;
+                prevMouseX = e.clientX;
+                prevMouseY = e.clientY;
+              } else {
+                targetRotY = mx * 0.45;
+                targetRotX = my * 0.35;
+                sunLight.position.x = mx * 6 + 2;
+                sunLight.position.y = -my * 5 + 3;
+              }
+
+              if (readout) {
+                const deg = Math.round(Math.atan2(my, mx) * (180 / Math.PI) + 180);
+                readout.textContent = `Three.js 光照角: ${deg}° · WebGL (可按住拖拽视角)`;
+              }
+            });
+          }
+
+          function resizeThree() {
+            if (!box) return;
+            width = box.offsetWidth || 400;
+            height = box.offsetHeight || 300;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+          }
+          window.addEventListener('resize', resizeThree);
+
+          function renderThree() {
+            group.rotation.y += (targetRotY + 0.15 - group.rotation.y) * 0.05;
+            group.rotation.x += (targetRotX - group.rotation.x) * 0.05;
+            renderer.render(scene, camera);
+            requestAnimationFrame(renderThree);
+          }
+          renderThree();
+          return;
+        }
+
+        // 降级 2D Canvas 光影模拟
+        const ctx = canvas.getContext('2d');
+        let angle = 0;
+        function drawFallback() {
+          ctx.clearRect(0, 0, width, height);
+          ctx.save();
+          ctx.translate(width / 2, height / 2);
+          angle += 0.008;
+          const boxSize = Math.min(width, height) * 0.32;
+          ctx.strokeStyle = 'rgba(142, 110, 101, 0.35)';
+          ctx.strokeRect(-boxSize/2, -boxSize/2, boxSize, boxSize);
+          ctx.restore();
+          requestAnimationFrame(drawFallback);
+        }
+        drawFallback();
+      }
+
+      // ==========================================
+      // 10. 案例复盘数据字典
+      // ==========================================
+      const PROJECT_STORIES = {
+        aether: {
+          tag: '01 · ARCHITECTURE & WEBGL',
+          title: 'Aether · 空间数字建筑展厅复盘',
+          content: `
+            <div class="space-y-4">
+              <h4 class="font-serif text-lg text-stone-900 dark:text-stone-100 font-medium">背景与美学命题</h4>
+              <p>传统线上 3D 展厅常充斥花哨的发光贴图与沉重的加载卡顿。Aether 旨在复刻安藤忠雄式清水混凝土与自然光影的绝对纯粹，让建筑空间的虚实借由浏览器视口流动表达。</p>
+              
+              <h4 class="font-serif text-lg text-stone-900 dark:text-stone-100 font-medium pt-2">工程突破</h4>
+              <ul class="list-disc pl-5 space-y-1.5 text-xs font-mono">
+                <li>基于 Three.js 定制简化版 Cook-Torrance 漫反射着色器，剔除 80% 冗余运算。</li>
+                <li>将视口滚动阻尼与相机焦点矩阵平滑解耦，确保 120Hz 刷新率下的物理拟真感。</li>
+                <li>总资产包体积严格限制于 1.8MB 内，实现亚秒级首屏渐进网格流式解压。</li>
+              </ul>
+            </div>
+          `
+        },
+        chronos: {
+          tag: '02 · TYPOGRAPHY ENGINE',
+          title: 'Chronos · 触觉动态排印工作室复盘',
+          content: `
+            <div class="space-y-4">
+              <h4 class="font-serif text-lg text-stone-900 dark:text-stone-100 font-medium">从平面排印到触觉机械</h4>
+              <p>数字排版长期受限于离散的字号与字重输入框。Chronos 通过 Variable Fonts API 建立连续物理轴，让设计师能如拉动金属拉簧般微调西文衬线张力。</p>
+              
+              <h4 class="font-serif text-lg text-stone-900 dark:text-stone-100 font-medium pt-2">物理阻尼与微音效</h4>
+              <ul class="list-disc pl-5 space-y-1.5 text-xs font-mono">
+                <li>利用有限状态机构建二阶欠阻尼弹簧系统，实时计算手势拖拽惯性。</li>
+                <li>接入 Web Audio API 合成真实金属字模敲击的微型共振脉冲。</li>
+                <li>支持实时导出遵循 OpenType 标准的可变字体特征代币。</li>
+              </ul>
+            </div>
+          `
+        },
+        modus: {
+          tag: '03 · DESIGN SYSTEMS',
+          title: 'Modus · 跨端规范原子引擎复盘',
+          content: `
+            <div class="space-y-4">
+              <h4 class="font-serif text-lg text-stone-900 dark:text-stone-100 font-medium">终结多端样式漂移</h4>
+              <p>在涉及 Web、iOS 与 Android 的百万级应用中，UI 细节漂移往往源于语义断层。Modus 建立了单一可信源原子代币编译管道。</p>
+              
+              <h4 class="font-serif text-lg text-stone-900 dark:text-stone-100 font-medium pt-2">架构规范与流水线</h4>
+              <ul class="list-disc pl-5 space-y-1.5 text-xs font-mono">
+                <li>严格践行 W3C Design Tokens 规范，通过 AST 生成各端类型安全常量。</li>
+                <li>集成零运行时 CSS 变量树，彻底消除前端框架样式重排损耗。</li>
+                <li>设立视觉回归差分校验守门人机制，保障版本迭代零瑕疵。</li>
+              </ul>
+            </div>
+          `
+        }
+      };
+
+      // ==========================================
+      // 11. 初始化与事件绑定 (DOM Ready)
+      // ==========================================
+      document.addEventListener('DOMContentLoaded', () => {
+        // 1. 初始化 Lucide 图标
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+
+        // 2. 骨架屏淡出逻辑 (加载后 650ms 平滑揭示真实内容)
+        const skeleton = document.getElementById('skeleton-screen');
+        if (skeleton) {
+          setTimeout(() => {
+            skeleton.style.opacity = '0';
+            setTimeout(() => {
+              skeleton.style.display = 'none';
+            }, 700);
+          }, 650);
+        }
+
+        // 3. 骨架屏演示重播按钮
+        const replaySkeletonBtn = document.getElementById('replay-skeleton-btn');
+        if (replaySkeletonBtn && skeleton) {
+          replaySkeletonBtn.addEventListener('click', () => {
+            skeleton.style.display = 'flex';
+            skeleton.style.opacity = '1';
+            playTactileTick('wood');
+            showToast('正在演示 850ms 骨架屏加载与物理揭示', 'loader');
+            setTimeout(() => {
+              skeleton.style.opacity = '0';
+              setTimeout(() => {
+                skeleton.style.display = 'none';
+              }, 700);
+            }, 850);
+          });
+        }
+
+        // 4. 音效开关
+        const audioBtn = document.getElementById('audio-toggle-btn');
+        if (audioBtn) {
+          audioBtn.addEventListener('click', () => {
+            isAudioEnabled = !isAudioEnabled;
+            const onIcon = audioBtn.querySelector('.audio-on-icon');
+            const offIcon = audioBtn.querySelector('.audio-off-icon');
+            const label = audioBtn.querySelector('.audio-label');
+            
+            if (isAudioEnabled) {
+              if (onIcon) onIcon.classList.remove('hidden');
+              if (offIcon) offIcon.classList.add('hidden');
+              if (label) label.textContent = '音效 开';
+              playTactileTick('crystal');
+              showToast('触觉微音效已激活', 'volume-2');
+            } else {
+              if (onIcon) onIcon.classList.add('hidden');
+              if (offIcon) offIcon.classList.remove('hidden');
+              if (label) label.textContent = '音效 关';
+              showToast('触觉音效已静音', 'volume-x');
+            }
+          });
+        }
+
+        // 5. 主题切换 (浅色 / 深色)
+        const themeBtn = document.getElementById('theme-toggle-btn');
+        if (themeBtn) {
+          themeBtn.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
+              document.documentElement.classList.add('dark');
+              showToast('已切换至莫兰迪暗夜色阶', 'moon');
+            } else {
+              document.documentElement.classList.remove('dark');
+              showToast('已切换至晨霜白露色阶', 'sun');
+            }
+            playTactileTick('wood');
+            updateScrollScrub();
+          });
+        }
+
+        // 6. 12 栏隐形网格开关
+        const gridBtn = document.getElementById('toggle-grid-btn');
+        const gridOverlay = document.getElementById('grid-overlay');
+        const gridStatusText = document.getElementById('grid-status-text');
+        if (gridBtn && gridOverlay) {
+          gridBtn.addEventListener('click', () => {
+            isGridVisible = !isGridVisible;
+            if (isGridVisible) {
+              gridOverlay.style.opacity = '1';
+              if (gridStatusText) gridStatusText.textContent = '12 栏模数: 显示';
+              showToast('12 栏响应式模数对齐辅助线已显现 (4/8/12 栏自适应)', 'grid');
+            } else {
+              gridOverlay.style.opacity = '0';
+              if (gridStatusText) gridStatusText.textContent = '12 栏模数: 隐形';
+              showToast('模数辅助线已隐藏', 'grid');
+            }
+            playTactileTick('crystal');
+          });
+        }
+
+        // 快捷键 'g' 切换网格
+        window.addEventListener('keydown', e => {
+          if ((e.key === 'g' || e.key === 'G') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+            if (gridBtn) gridBtn.click();
+          }
+        });
+
+        // 7. 联络模态框开关
+        const contactModal = document.getElementById('contact-modal');
+        const navContactBtn = document.getElementById('nav-contact-btn');
+        const bannerContactBtn = document.getElementById('banner-contact-btn');
+        const closeContactBtn = document.getElementById('close-contact-modal-btn');
+        const contactBackdrop = document.getElementById('contact-modal-backdrop');
+        const contactForm = document.getElementById('contact-form');
+
+        [navContactBtn, bannerContactBtn].forEach(btn => {
+          if (btn) btn.addEventListener('click', () => showModal(contactModal));
+        });
+
+        [closeContactBtn, contactBackdrop].forEach(el => {
+          if (el) el.addEventListener('click', () => hideModal(contactModal));
+        });
+
+        if (contactForm) {
+          contactForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const name = document.getElementById('contact-name')?.value || '阁下';
+            hideModal(contactModal);
+            showToast(`感谢 ${name}，委托意向已成功接收，将尽快与您探讨。`, 'check-circle');
+            contactForm.reset();
+          });
+        }
+
+        // 8. 简历档案模态框开关
+        const resumeModal = document.getElementById('resume-modal');
+        const heroResumeBtn = document.getElementById('hero-resume-btn');
+        const closeResumeBtn = document.getElementById('close-resume-modal-btn');
+        const cancelResumeBtn = document.getElementById('cancel-resume-btn');
+        const resumeBackdrop = document.getElementById('resume-modal-backdrop');
+        const downloadResumeFileBtn = document.getElementById('download-resume-file-btn');
+
+        if (heroResumeBtn) {
+          heroResumeBtn.addEventListener('click', () => showModal(resumeModal));
+        }
+
+        [closeResumeBtn, cancelResumeBtn, resumeBackdrop].forEach(el => {
+          if (el) el.addEventListener('click', () => hideModal(resumeModal));
+        });
+
+        if (downloadResumeFileBtn) {
+          downloadResumeFileBtn.addEventListener('click', () => {
+            hideModal(resumeModal);
+            showToast('已准备好 Alex Chen 的简历档案 (PDF)', 'file-text');
+          });
+        }
+
+        // 9. 案例深度复盘模态框
+        const projectModal = document.getElementById('project-modal');
+        const closeProjectModalBtn = document.getElementById('close-project-modal-btn');
+        const dismissProjectModalBtn = document.getElementById('dismiss-project-modal-btn');
+        const projectBackdrop = document.getElementById('project-modal-backdrop');
+        const projectModalTitle = document.getElementById('project-modal-title');
+        const projectModalTag = document.getElementById('project-modal-tag');
+        const projectModalContent = document.getElementById('project-modal-content');
+
+        document.querySelectorAll('.project-detail-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const projectKey = btn.getAttribute('data-project');
+            const data = PROJECT_STORIES[projectKey];
+            if (data && projectModalContent && projectModalTitle && projectModalTag) {
+              projectModalTag.textContent = data.tag;
+              projectModalTitle.textContent = data.title;
+              projectModalContent.innerHTML = data.content;
+              showModal(projectModal);
+            }
+          });
+        });
+
+        [closeProjectModalBtn, dismissProjectModalBtn, projectBackdrop].forEach(el => {
+          if (el) el.addEventListener('click', () => hideModal(projectModal));
+        });
+
+        // 10. 邮箱复制按钮
+        const copyEmailBtn = document.getElementById('copy-email-btn');
+        if (copyEmailBtn) {
+          copyEmailBtn.addEventListener('click', () => {
+            const email = 'alex.chen.studio@domain.com';
+            try {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(email);
+              } else {
+                const ta = document.createElement('textarea');
+                ta.value = email;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+              }
+              showToast('联络邮箱已复制至剪贴板', 'check');
+            } catch (err) {
+              showToast(`联络邮箱: ${email}`, 'mail');
+            }
+          });
+        }
+
+        // 11. 案例 2 可变字体阻尼滑块交互
+        const fontSlider = document.getElementById('font-weight-slider');
+        const fontPreview = document.getElementById('interactive-type-preview');
+        const fontVal = document.getElementById('font-axis-val');
+        if (fontSlider && fontPreview && fontVal) {
+          fontSlider.addEventListener('input', e => {
+            const val = e.target.value;
+            fontPreview.style.fontWeight = val;
+            fontVal.textContent = `${val} · 64pt`;
+            if (val % 50 === 0) playTactileTick('crystal');
+          });
+        }
+
+        // 11.1 案例 2 多语系字模实时切换
+        const sampleBtns = document.querySelectorAll('.font-sample-btn');
+        const SAMPLES = {
+          latin: 'Amplitūdo',
+          cjk: '纯粹有度',
+          mono: '0123456789'
+        };
+        sampleBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const type = btn.getAttribute('data-sample');
+            if (fontPreview && SAMPLES[type]) {
+              fontPreview.textContent = SAMPLES[type];
+              sampleBtns.forEach(b => {
+                b.classList.remove('bg-white', 'dark:bg-stone-700', 'text-stone-900', 'dark:text-stone-100', 'shadow-xs');
+                b.classList.add('text-stone-500', 'dark:text-stone-400');
+              });
+              btn.classList.add('bg-white', 'dark:bg-stone-700', 'text-stone-900', 'dark:text-stone-100', 'shadow-xs');
+              btn.classList.remove('text-stone-500', 'dark:text-stone-400');
+              playTactileTick('metal');
+            }
+          });
+        });
+
+        // 12. 案例 3 代币编译实时换肤沙盘
+        const tokenTestBtn = document.getElementById('token-test-btn');
+        const tokenColorVal = document.getElementById('token-color-val');
+        const tokenCompileStatus = document.getElementById('token-compile-status');
+        const PALETTES = [
+          { name: '肉桂暖石 Cinnamon', hex: '#8E6E65' },
+          { name: '冷杉雪松 Cedar', hex: '#6E7A75' },
+          { name: '暮色陶灰 Clay', hex: '#7C6568' },
+          { name: '白露晨霜 Frost', hex: '#9E857F' }
+        ];
+        let paletteIdx = 0;
+        if (tokenTestBtn && tokenColorVal) {
+          tokenTestBtn.addEventListener('click', () => {
+            paletteIdx = (paletteIdx + 1) % PALETTES.length;
+            const chosen = PALETTES[paletteIdx];
+            tokenColorVal.textContent = chosen.hex;
+            tokenColorVal.style.color = chosen.hex;
+            if (tokenCompileStatus) {
+              tokenCompileStatus.textContent = 'AST 编译完成: ' + chosen.name;
+            }
+            playTactileTick('pulse');
+            showToast(`已编译全局 Design Token: ${chosen.name} (${chosen.hex})`, 'cpu');
+          });
+        }
+
+                // 12.3 全局快捷键指挥中心 HUD 交互
+        const cmdHudModal = document.getElementById('cmd-hud-modal');
+        const openCmdHudBtn = document.getElementById('open-cmd-hud-btn');
+        const closeCmdHudBtn = document.getElementById('close-cmd-hud-btn');
+        const cmdHudBackdrop = document.getElementById('cmd-hud-backdrop');
+
+        if (openCmdHudBtn) openCmdHudBtn.addEventListener('click', () => showModal(cmdHudModal));
+        [closeCmdHudBtn, cmdHudBackdrop].forEach(el => {
+          if (el) el.addEventListener('click', () => hideModal(cmdHudModal));
+        });
+
+        // 监听键盘按键
+        window.addEventListener('keydown', e => {
+          if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+          if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+            e.preventDefault();
+            if (cmdHudModal.classList.contains('opacity-0')) {
+              showModal(cmdHudModal);
+            } else {
+              hideModal(cmdHudModal);
+            }
+          } else if (e.key === 't' || e.key === 'T') {
+            const themeBtn = document.getElementById('theme-toggle-btn');
+            if (themeBtn) themeBtn.click();
+          } else if (e.key === 'm' || e.key === 'M') {
+            const audioBtn = document.getElementById('audio-toggle-btn');
+            if (audioBtn) audioBtn.click();
+          } else if (e.key === 'c' || e.key === 'C') {
+            const navContactBtn = document.getElementById('nav-contact-btn');
+            if (navContactBtn) navContactBtn.click();
+          } else if (e.key === '1') {
+            document.getElementById('philosophy')?.scrollIntoView({ behavior: 'smooth' });
+            playTactileTick('wood');
+          } else if (e.key === '2') {
+            document.getElementById('disciplines')?.scrollIntoView({ behavior: 'smooth' });
+            playTactileTick('wood');
+          } else if (e.key === '3') {
+            document.getElementById('works')?.scrollIntoView({ behavior: 'smooth' });
+            playTactileTick('wood');
+          } else if (e.key === '4') {
+            document.getElementById('journey')?.scrollIntoView({ behavior: 'smooth' });
+            playTactileTick('wood');
+          } else if (e.key === 'Escape') {
+            hideModal(cmdHudModal);
+          }
+        });
+
+        // 12.1 绑定首屏探索胶囊点击平滑滚动
+        const heroScrollBtn = document.getElementById('hero-scroll-indicator');
+        if (heroScrollBtn) {
+          heroScrollBtn.addEventListener('click', () => {
+            const philoSec = document.getElementById('philosophy');
+            if (philoSec) {
+              philoSec.scrollIntoView({ behavior: 'smooth' });
+              playTactileTick('wood');
+            }
+          });
+        }
+
+        // 12.2 启动水平滑动卡片画廊 (能力与作品板块)
+        setupHorizontalSlider('disciplines-slider', 'disc-slider-prev', 'disc-slider-next', 'disc-slider-indicator');
+        setupHorizontalSlider('works-slider', 'works-slider-prev', 'works-slider-next', 'works-slider-indicator');
+
+        // 13. 启动基础系统
+        setupLiquidGlassCards();
+        startLiveClock();
+        initAetherCanvas();
+
+        // 14. 启动 Studio Freight Lenis 顶级平滑滚动引擎 (与 GSAP ScrollTrigger 联动)
+        let lenisEngine = null;
+        if (typeof Lenis !== 'undefined') {
+          lenisEngine = new Lenis({
+            duration: 1.25,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smoothWheel: true,
+            touchMultiplier: 1.5,
+          });
+
+          lenisEngine.on('scroll', (e) => {
+            updateScrollScrub(e.scroll);
+            if (window.ScrollTrigger) ScrollTrigger.update();
+          });
+
+          function rafLenis(time) {
+            lenisEngine.raf(time);
+            requestAnimationFrame(rafLenis);
+          }
+          requestAnimationFrame(rafLenis);
+        } else {
+          // 原生 LERP 滚动循环降级
+          window.addEventListener('scroll', onScroll, { passive: true });
+        }
+
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+          gsap.registerPlugin(ScrollTrigger);
+        }
+
+        updateScrollScrub();
+      });
+
+    })();
+  </script>
+</body>
+</html>
